@@ -1,0 +1,37 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.pojo.ConsumerOrder">
+    <!--一对一映射-->
+    <!--方式一-->
+    <sql id="order">`order` o</sql>
+    <select id="ConsumerOrder1"  resultType="com.mybatis.pojo.ConsumerOrder">
+        select c.cid ,c.cname,c.csex,o.oid,o.oname,o.createtime from  consumer c ,
+        <include refid="order"></include>
+        <where>c.cid=o.cid</where>
+    </select>
+
+    <!--方式二-->
+    <resultMap id="orderConsumerResultMap" type="com.mybatis.pojo.Order">
+        <id property="oid" column="oid"></id>
+        <result property="oname" column="oname"></result>
+        <result property="cid" column="cid"></result>
+        <result property="createtime" column="createtime"></result>
+
+        <association property="consumer" javaType="com.mybatis.pojo.Consumer">
+            <id property="cid" column="cid"></id>
+            <result property="cname" column="cname"></result>
+            <result property="csex" column="csex"></result>
+        </association>
+    </resultMap>
+
+    <select id="ConsumerOrder2"   resultMap="orderConsumerResultMap">
+        select c.cid ,c.cname,c.csex,o.oid,o.oname,o.createtime from  consumer c ,
+        <include refid="order"></include>
+        <where>c.cid=o.cid</where>
+    </select>
+
+
+</mapper>
+
+

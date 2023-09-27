@@ -1,0 +1,113 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.pojo.User">
+    <!--parameterType-->
+    <!--   基本数据类型-->
+    <select id="findById" parameterType="int" resultType="com.mybatis.pojo.User">
+        select * from student where uid = #{id}
+    </select>
+        <!--包装器类型-->
+    <select id="findById2" parameterType="Integer" resultType="com.mybatis.pojo.User">
+        select * from student where uid = #{id}
+    </select>
+    <!--String类型-->
+    <select id="findByName"  parameterType="String"  resultType="com.mybatis.pojo.User">
+        select * from student where uname=#{name}
+    </select>
+     <!--传递对象类型-->
+    <select id="findByPojo"  parameterType="com.mybatis.pojo.User"   resultType="com.mybatis.pojo.User">
+        select * from student where uage=#{uage}
+    </select>
+    <!--传递 pojo的包装对象  （多条件查询如果有多个不同表的条件 ）-->
+    <select id="pojoCollection"  parameterType="com.mybatis.pojo.QueryVo" resultType="String">
+        select uname from student where uage=#{parm1}  and  uid=#{parm2}
+    </select>
+
+
+    <!--resultType-->
+    <!--返回一些基本的数据类型-->
+    <select id="returnInt" parameterType="com.mybatis.pojo.User" resultType="int"
+>        select uage from student  where uname = #{uname}
+    </select>
+    <!--输出对象类型-->
+    <!--..............-->
+    <!--输出对象集合类型-->
+    <select id="returnCollectionList" parameterType="String" resultType="com.mybatis.pojo.User">
+         select * from student where uname=#{uname}
+    </select>
+    <!--&lt;!&ndash;使用resultType返回List<Map>，适用于多表查询返回结果集&ndash;&gt;  返回了多个map对象-->
+    <select id="returnCollectionList2" parameterType="String" resultType="java.util.Map">
+         select uid,uage from student where uname=#{uname}
+    </select>
+    <!--&lt;!&ndash;select使用resultType返回Map<String,Object>，适用于多表查询返回单个结果集&ndash;&gt; 返回了单个map对象-->
+    <select id="returnCollectionMap" parameterType="com.mybatis.pojo.User" resultType="java.util.Map">
+         select * from student where uname=#{uname} and uage=#{uage}
+    </select>
+
+
+    <!--ResultMap解决数据库字段的列名和类中的属性名不能相互对应的问题。-->
+    <!--显现复现-->
+    <select id="findByIdTest" resultMap="userResultMap" parameterType="Integer" resultType="com.mybatis.pojo.User">
+        select * from student where uid = #{id}
+    </select>
+
+    <!--解决方案-->
+    <resultMap id="userResultMap" type="com.mybatis.pojo.User">
+        <result property="uname" column="u_name"></result>
+        <result property="uage" column="u_age"></result>
+    </resultMap>
+
+    <!--动态Sql 动态Sql-->
+     <!--&lt;!&ndash;if标签&ndash;&gt; if标签用在select标签里面-->
+    <select id="ifLable" resultType="int">
+        select count(*) from student where  1=1
+         <if test="uname !=null  and  uname !='' ">
+             and uname like #{uname}"%"
+         </if>
+        <if test="uage!=null and uage!=0">
+              and uage> #{uage}
+        </if>
+    </select>
+
+    <!--sql片段-->
+    <sql id="sqlPeace" >
+        uid, uname,uage
+    </sql>
+
+    <select id="sqlPeace2"  resultType="com.mybatis.pojo.User">
+        select <include refid="sqlPeace"></include> from student
+    </select>
+
+    <!--foreach  标签  遍历  数组或者集合标签-->
+        <!--遍历数据库表里 uid为1.3.5.7的用户-->
+    <select id="foreach" parameterType="com.mybatis.pojo.QueryVo" resultType="com.mybatis.pojo.User">
+        select * from student where 
+        <foreach collection="uids" item="uid" open="uid in (" close=")" separator=",">
+            #{uid}
+        </foreach>
+    </select>
+
+    <select id="foreach2" parameterType="java.util.ArrayList" resultType="com.mybatis.pojo.User">
+        select * from student where
+        <foreach collection="uids" item="uid" open="uid in (" close=")" separator=",">
+            #{uid}
+        </foreach>
+    </select>
+
+    <select id="foreach3"  resultType="com.mybatis.pojo.User">
+        select * from student where
+        <foreach collection="array" item="uid" open="uid in(" close=")" separator=",">
+            #{uid}
+        </foreach>
+    </select>
+    
+    
+    <!--sql缓存-->
+    <select id="selectByName" parameterType="String" resultType="com.mybatis.pojo.User">
+        select * from student where  uname=#{uname}
+    </select>
+
+</mapper>
+
+
